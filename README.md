@@ -1,34 +1,210 @@
-#This is the read me File 
+# PlatformBot-ElecStack
 
-I will give the instructions to ssh your github so you can directly upload 
+Full electrical ROS 2 stack for PlatformBot.
 
+**Repo structure (checked on 2026-04-19):**
+- `dev_ws/` is the ROS 2 workspace in this repo
+  - `dev_ws/src/base/` is a ROS 2 Python package (`ament_python`)
+- `src/` at repo root contains standalone scripts (not a ROS package)
 
-do 
+> If you are working with ROS 2 packages, use `dev_ws/` as your workspace.
 
-1. sudo apt install git 
-2. git config --global user.name "Your Name"
-3. git config --global user.email "your_email@example.com"
-4. ssh-keygen -t ed25519 -C "your_email@example.com"
-5. cat ~/.ssh/id_ed25519.pub
-6. ssh -T git@github.com
+---
 
-This will initialise and give you your SSH key to for the github
+## 1) Prerequisites
 
-Go to github and then add go to settings there you will find SSH ang GPG keys and under the SSH and GPG, add your SSH key
+### Install Git
+```bash
+sudo apt update
+sudo apt install -y git
+```
 
-This is the basic code to create a project and add 
+### Configure Git
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your_email@example.com"
+```
 
-mkdir myproject && cd myproject
-git init
-echo "# My Project" > README.md
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin git@github.com:USERNAME/REPO.git
-git push -u origin main
+### (Recommended) GitHub SSH setup
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+cat ~/.ssh/id_ed25519.pub
+ssh -T git@github.com
+```
+Add the printed public key to GitHub: **Settings → SSH and GPG keys → New SSH key**.
 
+---
 
+## 2) Clone / Pull
 
-git clone git@github.com:mad-hav-22-07/REPO_NAME.git
+### Clone
+Clone anywhere you want (example: home directory):
+```bash
+cd ~
+git clone git@github.com:HYPEREON008/PlatformBot-ElecStack.git
+```
 
-REPO_NAME = Elec_stack_Platform_Bot
+### Pull latest changes
+```bash
+cd PlatformBot-ElecStack
+git pull
+```
+
+---
+
+## 3) ROS 2 workspace: source + dependencies + build
+
+### Go to the workspace
+This repo contains the ROS 2 workspace under `dev_ws/`:
+```bash
+cd PlatformBot-ElecStack/dev_ws
+```
+
+### Source ROS 2
+Replace `<distro>` with your ROS 2 distro (e.g. `humble`, `iron`, `jazzy`):
+```bash
+source /opt/ros/<distro>/setup.bash
+```
+
+### Install dependencies with rosdep
+```bash
+sudo apt update
+sudo apt install -y python3-rosdep
+sudo rosdep init 2>/dev/null || true
+rosdep update
+
+# from dev_ws/
+rosdep install --from-paths src --ignore-src -r -y
+```
+
+### Build
+```bash
+# from dev_ws/
+colcon build --symlink-install
+```
+
+### Source the overlay (every new terminal)
+```bash
+# from dev_ws/
+source install/setup.bash
+```
+
+---
+
+## 4) Build a single package
+Example for the `base` package:
+```bash
+cd PlatformBot-ElecStack/dev_ws
+colcon build --symlink-install --packages-select base
+source install/setup.bash
+```
+
+---
+
+## 5) Create a new package in this workspace
+
+### Create a Python package
+```bash
+cd PlatformBot-ElecStack/dev_ws/src
+ros2 pkg create my_py_pkg --build-type ament_python --dependencies rclpy
+```
+
+### Create a C++ package
+```bash
+cd PlatformBot-ElecStack/dev_ws/src
+ros2 pkg create my_cpp_pkg --build-type ament_cmake --dependencies rclcpp
+```
+
+Then rebuild:
+```bash
+cd PlatformBot-ElecStack/dev_ws
+colcon build --symlink-install
+source install/setup.bash
+```
+
+---
+
+## 6) Create your node inside a package (example: Python)
+
+This repo already has a Python package at: `dev_ws/src/base` (package name: `base`).
+
+### Add a node file
+Create a file:
+- `PlatformBot-ElecStack/dev_ws/src/base/base/talker.py`
+
+Example content:
+```python
+#!/usr/bin/env python3
+import rclpy
+from rclpy.node import Node
+
+class Talker(Node):
+    def __init__(self):
+        super().__init__('talker')
+        self.get_logger().info('Hello from base.talker!')
+
+def main():
+    rclpy.init()
+    node = Talker()
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+```
+
+Make it executable:
+```bash
+chmod +x PlatformBot-ElecStack/dev_ws/src/base/base/talker.py
+```
+
+### Register the node in `setup.py`
+Edit: `dev_ws/src/base/setup.py` and add an entry under `console_scripts`:
+
+```python
+entry_points={
+    'console_scripts': [
+        'talker = base.talker:main',
+    ],
+},
+```
+
+### Build + run
+```bash
+cd PlatformBot-ElecStack/dev_ws
+colcon build --symlink-install --packages-select base
+source install/setup.bash
+ros2 run base talker
+```
+
+---
+
+## 7) Git push rules for this repo
+
+### What to commit
+Commit **only source code** (packages + scripts). Do **not** commit build outputs.
+
+If you build inside `dev_ws/`, these are generated and must not be pushed:
+- `dev_ws/build/`
+- `dev_ws/install/`
+- `dev_ws/log/`
+
+### Typical workflow
+```bash
+cd PlatformBot-ElecStack
+
+# check changes
+git status
+
+# stage
+git add README.md dev_ws/src
+
+# commit
+git commit -m "Update ROS 2 instructions / add nodes"
+
+# push
+git push
+```
+
+> If you truly want to push *only* the workspace sources, stage only `dev_ws/src/` (and optionally docs like `README.md`).
