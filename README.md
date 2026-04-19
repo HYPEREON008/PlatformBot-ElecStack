@@ -194,9 +194,33 @@ If you build inside `dev_ws/`, these are generated and must not be pushed:
 - `dev_ws/install/`
 - `dev_ws/log/`
 
+### Create a branch (once per feature)
+
+```bash
+cd PlatformBot-ElecStack
+
+# make sure main is up to date
+git checkout main
+git pull
+
+# create and switch to a new branch
+git checkout -b my_branch_name
+
+# push existence of this branch to origin
+# for first time using push to new branch use -u (Set upstream)
+git push -u origin my_branch_name
+```
+
+
 ### Typical workflow
 ```bash
 cd PlatformBot-ElecStack
+
+# check which branch you're on
+git branch
+
+# if NOT on your branch, switch to it
+git checkout my_branch_name
 
 # check changes
 git status
@@ -204,9 +228,9 @@ git status
 # stage
 git add dev_ws/src
 
-# commit (change commit message)
+# commit
 git commit -m "modified xxx nodes"
 
-# push
+# push (no need to mention branch anymore)
 git push
 ```
