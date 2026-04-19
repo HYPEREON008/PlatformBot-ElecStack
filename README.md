@@ -5,7 +5,7 @@ Full electrical ROS 2 stack for PlatformBot.
 **Repo structure (checked on 2026-04-19):**
 - `dev_ws/` is the ROS 2 workspace in this repo
   - `dev_ws/src/base/` is a ROS 2 Python package (`ament_python`)
-- `src/` at repo root contains standalone scripts (not a ROS package)
+- `src/` at repo root contains standalone scripts for reference and learning purpose.
 
 > If you are working with ROS 2 packages, use `dev_ws/` as your workspace.
 
@@ -25,7 +25,7 @@ git config --global user.name "Your Name"
 git config --global user.email "your_email@example.com"
 ```
 
-### (Recommended) GitHub SSH setup
+### (Recommended) GitHub SSH setup (will save time in pushing)
 ```bash
 ssh-keygen -t ed25519 -C "your_email@example.com"
 cat ~/.ssh/id_ed25519.pub
@@ -117,6 +117,7 @@ ros2 pkg create my_cpp_pkg --build-type ament_cmake --dependencies rclcpp
 ```
 
 Then rebuild:
+symlink-install is not needed but will help in long term development, you can remove it for now
 ```bash
 cd PlatformBot-ElecStack/dev_ws
 colcon build --symlink-install
@@ -172,6 +173,8 @@ entry_points={
 ```
 
 ### Build + run
+symlink-install is not needed but will help in long term development, you can remove it for now
+
 ```bash
 cd PlatformBot-ElecStack/dev_ws
 colcon build --symlink-install --packages-select base
