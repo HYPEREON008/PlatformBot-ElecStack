@@ -11,7 +11,7 @@ Full electrical ROS 2 stack for PlatformBot.
 
 ---
 
-## 1) Prerequisites
+## 1) Prerequisites (skip this section)
 
 ### Install Git
 ```bash
@@ -36,9 +36,10 @@ Add the printed public key to GitHub: **Settings → SSH and GPG keys → New SS
 ---
 
 ## 2) Clone / Pull
-
 ### Clone
 Clone anywhere you want (example: home directory):
+
+change ~ to any other folder you want the repo in
 ```bash
 cd ~
 git clone git@github.com:HYPEREON008/PlatformBot-ElecStack.git
@@ -61,12 +62,12 @@ cd PlatformBot-ElecStack/dev_ws
 ```
 
 ### Source ROS 2
-Replace `<distro>` with your ROS 2 distro (e.g. `humble`, `iron`, `jazzy`):
+Use .zsh or any other shell if you dont use bash:
 ```bash
-source /opt/ros/<distro>/setup.bash
+source /opt/ros/jazzy/setup.bash
 ```
 
-### Install dependencies with rosdep
+### Install dependencies with rosdep (skip this section)
 ```bash
 sudo apt update
 sudo apt install -y python3-rosdep
@@ -101,9 +102,9 @@ source install/setup.bash
 
 ---
 
-## 5) Create a new package in this workspace
+## 5) Create a new package in this workspace (no need as of now)
 
-### Create a Python package
+### Create a Python package 
 ```bash
 cd PlatformBot-ElecStack/dev_ws/src
 ros2 pkg create my_py_pkg --build-type ament_python --dependencies rclpy
@@ -198,13 +199,11 @@ cd PlatformBot-ElecStack
 git status
 
 # stage
-git add README.md dev_ws/src
+git add dev_ws/src
 
-# commit
-git commit -m "Update ROS 2 instructions / add nodes"
+# commit (change commit message)
+git commit -m "modified xxx nodes"
 
 # push
 git push
 ```
-
-> If you truly want to push *only* the workspace sources, stage only `dev_ws/src/` (and optionally docs like `README.md`).
