@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+          'keystroke = base.key_stroke:main'
         ],
     },
 )
