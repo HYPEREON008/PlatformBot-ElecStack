@@ -136,8 +136,8 @@ class PID_Node(Node):
             value.data = [self.left_pid.setpoint,self.right_pid.setpoint,self.rpm_left,self.rpm_right,left_throttle,right_throttle]
             self.monitor_pub.publish(value)
 
-def main(args=None):
-    rclpy.init(args=args)
+def main(args = None):
+    rclpy.init(args = args)
     node = PID_Node()
     rclpy.spin(node)
     node.destroy_node()
