@@ -36,6 +36,7 @@ class Monitor_node(Node):
         self.axes[1].grid(True)
         self.axes[1].set_ylim(-200,200)
         self.axes[1].legend()
+        self.k_text = self.figure.text(0.5,0.05,"",ha = 'center')
     def callback_function(self,msg):
         left_wheel_setpoint = msg.data[0]
         right_wheel_setpoint = msg.data[1]
@@ -43,7 +44,7 @@ class Monitor_node(Node):
         right_wheel_rpm_value = msg.data[3]
         left_wheel_throttle = msg.data[4]
         right_wheel_throttle = msg.data[5]
-        self.get_logger().info(f"kp={self.kp},ki={self.ki},kd={self.kd}")
+        self.k_text.set_text(f"kp={self.kp},ki={self.ki},kd={self.kd}")
         self.left_throttle_values = np.roll(self.left_throttle_values,-1)
         self.left_throttle_values[-1] = left_wheel_throttle
         self.left_throttle_line.set_ydata(self.left_throttle_values)
@@ -70,10 +71,10 @@ class Monitor_node(Node):
     def input_loop(self):
         while True:
             try:
-                kp,ki,kd = input().split(" ") # kp ki kd is inout format
-                self.kp = int(kp)
-                self.ki = int(ki)
-                self.kd = int(kd)
+                kp,ki,kd = input().split("") # kp ki kd is inout format
+                self.kp = float(kp)
+                self.ki = float(ki)
+                self.kd = float(kd)
                 msg = Float32MultiArray()
                 msg.data = [self.kp,self.ki,self.kd]
                 self.pub.publish(msg)
