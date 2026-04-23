@@ -71,7 +71,7 @@ class Monitor_node(Node):
     def input_loop(self):
         while True:
             try:
-                kp,ki,kd = input().split("") # kp ki kd is inout format
+                kp,ki,kd = input().split("") # kp ki kd is input format
                 self.kp = float(kp)
                 self.ki = float(ki)
                 self.kd = float(kd)
