@@ -55,14 +55,14 @@ class PID_Node(Node):
         self.rpm_left = 0.0
         self.rpm_right = 0.0
         self.estop = 0 # 1 if estop is triggered
-        self.left_pid = Compute([-500,500],0.0,0.0,0.0)
-        self.right_pid = Compute([-500,500],0.0,0.0,0.0)
+        self.left_pid = Compute([-1000,1000],0.0,0.0,0.0)
+        self.right_pid = Compute([-1000,1000],0.0,0.0,0.0)
         self.prev_time = self.get_clock().now().nanoseconds/1e9
         self.estop_sub = self.create_subscription(Int8,'estop',self.estop_callback,10)
         self.monitor_sub = self.create_subscription(Float32MultiArray,'k_vals',self.monitor_callback,10)
         self.cmd_sub = self.create_subscription(Twist,'/cmd_vel_nav',self.cmd_callback,10)
         self.rpm_sub = self.create_subscription(Float32MultiArray,'rpm',self.rpm_callback,10)
-        self.mode_sub = self.create_subscription(Int8,'mode',self.mode_callback,10) # 0 for software,1 for keystroke, 2 for joystick
+        self.mode_sub = self.create_subscription(Int8,'/mode',self.mode_callback,10) # 0 for software,1 for keystroke, 2 for joystick
         self.keystroke_sub = self.create_subscription(Float32MultiArray,'vel_keystroke',self.keystroke_callback,10)
         self.joystick_sub = self.create_subscription(Twist,'vel_joystick',self.joystick_callback,10)
         self.throttle_pub = self.create_publisher(Float32MultiArray,'/throttle',10)
@@ -71,6 +71,8 @@ class PID_Node(Node):
         self.joystick_resolution = 10
         self.joystick_counter = 0 # will consider every joystick_resolutionth joystick command
         self.control_timer = self.create_timer(0.01,self.control_loop)
+    def mode_callback(self,msg):
+        self.mode = msg.data
     def estop_callback(self,msg):
         self.estop = msg.data
         if self.estop:
@@ -133,7 +135,7 @@ class PID_Node(Node):
             msg.data = [float(left_throttle),float(right_throttle)]
             self.throttle_pub.publish(msg)
             value = Float32MultiArray()
-            value.data = [self.left_pid.setpoint,self.right_pid.setpoint,self.rpm_left,self.rpm_right,left_throttle,right_throttle]
+            value.data = [self.left_pid.setpoint,self.right_pid.setpoint,self.rpm_left,self.rpm_right]
             self.monitor_pub.publish(value)
 
 def main(args = None):
