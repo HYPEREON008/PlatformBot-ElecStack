@@ -18,6 +18,8 @@ class Monitor_node(Node):
         self.kd = 0.0
         self.mode = 0
         self.modes = ['software','keystroke','joystick']
+        self.estop_sub = self.create_subscription(Int8,"estop",self.estop_callback,10)
+        self.estop = 0
         self.left_rpm_values = np.zeros(10)
         self.left_setpoint_values = np.zeros(10)
         self.right_rpm_values = np.zeros(10)
@@ -29,14 +31,17 @@ class Monitor_node(Node):
         self.right_setpoint_line, = self.axes[1].plot(self.right_setpoint_values,color = "green",label = "setpoint",drawstyle = "steps-post")
         self.axes[0].set_title("Left RPM")
         self.axes[0].grid(True)
-        self.axes[0].set_ylim(-1000,1000)
+        self.axes[0].set_ylim(-300,300)
         self.axes[0].legend()
         self.axes[1].set_title("Right RPM")
         self.axes[1].grid(True)
-        self.axes[1].set_ylim(-1000,1000)
+        self.axes[1].set_ylim(-300,300)
         self.axes[1].legend()
         self.k_text = self.figure.text(0.5,0.02,"",ha = 'center')
         self.mode_text = self.figure.text(0.5,0.06,"",ha = 'center')
+        self.estop_text = self.figure.text(0.5,0.04,"",ha = 'center')
+    def estop_callback(self,msg):
+        self.estop = msg.data
     def callback_function(self,msg):
         left_wheel_setpoint = msg.data[0]
         right_wheel_setpoint = msg.data[1]
@@ -44,6 +49,7 @@ class Monitor_node(Node):
         right_wheel_rpm_value = msg.data[3]
         self.k_text.set_text(f"kp={self.kp},ki={self.ki},kd={self.kd}")
         self.mode_text.set_text(f"Mode: {self.modes[self.mode]}")
+        self.estop_text.set_text(f"Estop: {bool(self.estop)}")
         self.left_rpm_values = np.roll(self.left_rpm_values,-1)
         self.left_rpm_values[-1] = left_wheel_rpm_value
         self.left_rpm_line.set_ydata(self.left_rpm_values)
@@ -85,7 +91,7 @@ class Monitor_node(Node):
                 else:
                     raise ValueError
             except Exception as e:
-                print("Invalid input")
+                self.get_logger().warn("Invalid input")
 
 def main(args = None):
     rclpy.init(args = args)

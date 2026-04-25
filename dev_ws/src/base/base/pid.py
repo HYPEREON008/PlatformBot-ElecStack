@@ -63,7 +63,7 @@ class PID_Node(Node):
         self.cmd_sub = self.create_subscription(Twist,'/cmd_vel_nav',self.cmd_callback,10)
         self.rpm_sub = self.create_subscription(Float32MultiArray,'rpm',self.rpm_callback,10)
         self.mode_sub = self.create_subscription(Int8,'/mode',self.mode_callback,10) # 0 for software,1 for keystroke, 2 for joystick
-        self.keystroke_sub = self.create_subscription(Float32MultiArray,'vel_keystroke',self.keystroke_callback,10)
+        self.keystroke_sub = self.create_subscription(Float32MultiArray,"keystroke",self.keystroke_callback,10)
         self.joystick_sub = self.create_subscription(Twist,'vel_joystick',self.joystick_callback,10)
         self.throttle_pub = self.create_publisher(Float32MultiArray,'/throttle',10)
         self.monitor_pub = self.create_publisher(Float32MultiArray,'/monitor',10)
@@ -71,8 +71,6 @@ class PID_Node(Node):
         self.joystick_resolution = 10
         self.joystick_counter = 0 # will consider every joystick_resolutionth joystick command
         self.control_timer = self.create_timer(0.01,self.control_loop)
-    def mode_callback(self,msg):
-        self.mode = msg.data
     def estop_callback(self,msg):
         self.estop = msg.data
         if self.estop:
