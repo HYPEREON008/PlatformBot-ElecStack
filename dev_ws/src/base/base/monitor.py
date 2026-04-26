@@ -19,7 +19,7 @@ class Monitor_node(Node):
         self.mode = 0
         self.modes = ['software','keystroke','joystick']
         self.estop_sub = self.create_subscription(Int8,"estop",self.estop_callback,10)
-        self.estop = 0
+        self.estop = 1
         self.left_rpm_values = np.zeros(10)
         self.left_setpoint_values = np.zeros(10)
         self.right_rpm_values = np.zeros(10)

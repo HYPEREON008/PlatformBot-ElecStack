@@ -54,7 +54,7 @@ class PID_Node(Node):
         self.wheel_separation = 0.4
         self.rpm_left = 0.0
         self.rpm_right = 0.0
-        self.estop = 0 # 1 if estop is triggered
+        self.estop = 1 # 1 if estop is triggered
         self.left_pid = Compute([-1000,1000],0.0,0.0,0.0)
         self.right_pid = Compute([-1000,1000],0.0,0.0,0.0)
         self.prev_time = self.get_clock().now().nanoseconds/1e9
